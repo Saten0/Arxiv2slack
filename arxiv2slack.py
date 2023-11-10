@@ -70,13 +70,15 @@ def parse(data, tag):
         obj = re.findall(pattern, data)
     return obj
 
-#Arxivライブラリを使えば大幅簡略可能
+
+number = 5 # 何件拾ってくるか
+#Arxivライブラリを使えば大幅簡略可能だが、やる事は一緒なのでやっていない
 def search_and_send(query, start, ids, api_url):
     translator = deepl.Translator(API_KEY)
     while True:
         counter = 0
         url = 'http://export.arxiv.org/api/query?search_query=' + query + '&start=' + str(
-            start) + '&max_results=5&sortBy=lastUpdatedDate&sortOrder=descending'
+            start) + '&max_results=' + number +'&sortBy=lastUpdatedDate&sortOrder=descending'
         # Get returned value from arXiv API
         data = requests.get(url).text
         # Parse the returned value
@@ -118,12 +120,12 @@ def search_and_send(query, start, ids, api_url):
                 response = requests.post(api_url, data=json.dumps({"value1": message3}),headers={'Content-Type': 'application/json'})
                 ids.append(url)
                 counter = counter + 1
-                if counter == 5:
+                if counter == number:
                     return 0
-        if counter == 0 and len(entries) < 5:
+        if counter == 0 and len(entries) < number:
             requests.post(api_url, data={"value1": "Currently, there is no available papers"})
             return 0
-        elif counter == 0 and len(entries) == 5:
+        elif counter == 0 and len(entries) == number:
             # When there is no available paper and full query
             requests.post(api_url, data={"value1": "新しい論文はありません"})
             return 0
